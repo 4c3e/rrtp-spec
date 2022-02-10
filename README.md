@@ -59,7 +59,33 @@ RIP requests are a single CRLF-terminated line with the following structure:
 This request system is identical to Gemini, the only difference being that the RNS Destination segment of the URL can be replaced with a "\*" if users want to preserve bandwidth, this is because Link's already imply a single RNS destination. It is important to still include the scheme prefix, so RIP servers can seamlessly handle multiple different protocols.
 
 # 3 RIP Responses
+RIP responses consist of a single CRLF-terminated header line, optionally followed by a response body.
 
+# 3.1 Response Headers
+RIP response headers look like this (exactly the same as Gemini Headers):
+	
+
+`<STATUS><SPACE><META><CR><LF>`
+
+
+`<STATUS>` is a two-digit numeric status code, as described below in 3.2 and in Appendix 1.
+
+
+`<SPACE>` is a single space character, i.e. the byte 0x20.
+
+
+`<META>` is a UTF-8 encoded string of maximum length 1024 bytes, whose meaning is `<STATUS>` dependent.
+
+
+The response header as a whole and `<META>` as a sub-string both MUST NOT begin with a U+FEFF byte order mark.
+
+
+If `<STATUS>` does not belong to the "SUCCESS" range of codes, then the server MUST close the connection after sending the header and MUST NOT send a response body.
+
+
+If a server sends a `<STATUS>` which is not a two-digit number or a `<META>` which exceeds 1024 bytes in length, the client SHOULD close the connection and disregard the response header, informing the user of an error.
+	
+	
 	
 
 	
