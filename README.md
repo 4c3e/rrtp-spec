@@ -7,10 +7,10 @@ Reticulum Internet Protocol (RIP) is a Client/Server internet protocol based on 
 Currently there is one main type of RIP transaction, in the future, standard RIP transactions could potentially lead to the opening of "Raw" Link connections that would act similar to modern websockets, however this is all currently out of scope.
 This is based heavily on the Gemini Transaction Protocol, with a few key differences.
 
-C:   Opens connection
+C:   Makes Link Request to RNS destination
 	
 
-S:   Accepts connection
+S:   Accepts Link Request
 	
 
 C:   Sends request (one CRLF terminated line) (see section 2)
