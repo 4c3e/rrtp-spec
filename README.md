@@ -1,25 +1,20 @@
 # Reticulum Internet Protocol Spec 0.1
 
-Reticulum Internet Protocol (RIP) is a Client/Server internet protocol based on Gemini, and Http. RIP is designed specifically for high-latency, low-bandwidth connections through mesh networks. These connections are achived using the Reticulum Network Stack (RNS) and specifically the RNS Link API. The Link API allows an authenticated, encrypted, bi-directional tunnel between two Reticulum nodes, with an arbitrary amount of hops between them. Because of the preset cryptographic handshake between client and server in the Link setup, no further cryptographic manuvers are needed in the RIP.
+Reticulum Internet Protocol (RIP) is a Client/Server internet protocol based on Gemini and Http. RIP allows for the bi-directional transfer of Reticulum [Resources](https://markqvist.github.io/Reticulum/manual/reference.html#resource) over the Reticulum [Link API](https://markqvist.github.io/Reticulum/manual/reference.html#link). 
 
 # 1.1 RIP Transactions
 
-Currently there is one main type of RIP transaction, in the future, standard RIP transactions could potentially lead to the opening of "Raw" Link connections that would act similar to modern websockets, however this is all currently out of scope.
-This is based heavily on the Gemini Transaction Protocol, with a few key differences.
+Currently there is one main type of RIP transaction, essentially a GET request. In the future, RIP will allow for "POST" requests to be made, allowing clients to send resources to the server. One additional proposed feature that could be interesting, is the ability for the client and/or server to request the RIP connection revert back to a "raw" Link connection, which would allow for something similar to http's Server-Side Events or websockets. 
 
-C:   Makes Link Request to RNS destination
-	
-
-S:   Accepts Link Request
-	
+[[CLIENT AND SERVER FIRST ESTABLISH A RETICULUM LINK]] (Details explained [here](https://markqvist.github.io/Reticulum/manual/understanding.html#link-establishment-in-detail))
 
 C:   Sends request (one CRLF terminated line) (see section 2)
 	
 
-S:   Sends response header (one CRLF terminated line), closes connection under non-success conditions (see 3.1 and 3.2)
+S:   Sends response header (one CRLF terminated line), closes Link under non-success conditions (see 3.1 and 3.2)
 	
 
-S:   Sends response body (text or binary data) (see 3.3)
+S:   Sends response body (Reticulum Resource containing text or binary data) (see 3.3)
 	
 
 C:   Handles response (see 3.4)
@@ -36,7 +31,7 @@ S:   Recieves Kill request and severs Link.
 # 1.2 RIP URL Scheme
 Resources hosted via RIP protocol are requested with the general structure of: 
 
-`rip://<Reticulum Destination String>/optional/sub/paths`
+`rip://<Reticulum Destination Hash String>/optional/sub/paths`
 
 Some notes:
 - Actual destinations are not sandwiched in "<>"
