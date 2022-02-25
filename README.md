@@ -70,6 +70,9 @@ request_resource = RNS.Resource(packed_request, self, request_id = request_id, i
 
 # 3 RIP Responses
 RIP responses consist of a single CRLF-terminated header line, optionally followed by a response body. For simplicity, message headers and bodies are bundled together in the following method:
+`[header,body]`
+
+Here is how RIP Responses are constructed in the reference python implementation:
 
 ```python
 packed_rip_respond = umsgpack.packb([header,body])
