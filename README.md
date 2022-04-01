@@ -1,10 +1,12 @@
-# Reticulum Internet Protocol Spec 0.1
+# Reticulum Resource Transfer Protocol Spec 0.1
 
-Reticulum Internet Protocol (RIP) is a Client/Server internet protocol based on Gemini and Http. RIP allows for the bi-directional transfer of Reticulum [Resources](https://markqvist.github.io/Reticulum/manual/reference.html#resource) over the Reticulum [Link API](https://markqvist.github.io/Reticulum/manual/reference.html#link). 
+Reticulum Resource Transfer Protocol (RRTP) is a Client/Server protocol based on HTTP/1.0. 
 
-# 1.1 RIP Transactions
+RRTP allows for the bi-directional transfer of Reticulum [Resources](https://markqvist.github.io/Reticulum/manual/reference.html#resource) over the Reticulum [Link API](https://markqvist.github.io/Reticulum/manual/reference.html#link). 
 
-Currently there is one main type of RIP transaction, essentially a GET request. In the future, RIP will allow for "POST" requests to be made, allowing clients to send resources to the server. One additional proposed feature that could be interesting, is the ability for the client and/or server to request the RIP connection revert back to a "raw" Link connection, which would allow for something similar to http's Server-Side Events or websockets. 
+# 1.1 RRTP Transactions
+
+Currently there is one main type of RRTP transaction, essentially a GET request. In the future, RRTP will allow for "POST" requests to be made, allowing clients to send resources to the server. One additional proposed feature that could be interesting, is the ability for the client and/or server to request the RRTP connection revert back to a "raw" Link connection, which would allow for something similar to http's Server-Side Events or websockets. 
 
 [[CLIENT AND SERVER FIRST ESTABLISH A RETICULUM LINK]] (Details explained [here](https://markqvist.github.io/Reticulum/manual/understanding.html#link-establishment-in-detail))
 
@@ -25,10 +27,10 @@ C:   If Client requests a page on a seperate RNS destination, or exits, Client t
 
 S:   Recieves Client disconnect.
 
-# 1.2 RIP URL Scheme
-Resources hosted via RIP protocol are requested with the general structure of: 
+# 1.2 RRTP URL Scheme
+Resources hosted via RRTP protocol are requested with the general structure of: 
 
-`rip://<Reticulum Destination Hash String>/optional/sub/paths`
+`rrtp://<Reticulum Destination Hash String>/optional/sub/paths`
 
 Some notes:
 - Actual destinations are not sandwiched in "<>"
@@ -41,8 +43,8 @@ A note on human-readable names:
 
 Reticulum destinations are excellent as a decentralized global naming scheme, but they are not great for creating human-readable names. The easiest approach to this problem is to allow clients to create "Local Address Books" which locally store mappings between RNS destinations and "traditional" URL names. These files could then be shared between pairs and grassroot consensuses could begin to be formed in communities.
 
-# 2 RIP Requests
-RIP requests are a single msgpacked Packet or Resource with the following structure (before being packed):
+# 2 RRTP Requests
+RRTP requests are a single msgpacked Packet or Resource with the following structure (before being packed):
 
 [time.time(), request_path_hash, data]
 
@@ -68,11 +70,11 @@ request_id = RNS.Identity.truncated_hash(packed_request)
 request_resource = RNS.Resource(packed_request, self, request_id = request_id, is_response = False, timeout = timeout)
 ```                
 
-# 3 RIP Responses
-RIP responses consist of a single CRLF-terminated header line, optionally followed by a response body. For simplicity, message headers and bodies are bundled together in the following method:
+# 3 RRTP Responses
+RRTP responses consist of a single CRLF-terminated header line, optionally followed by a response body. For simplicity, message headers and bodies are bundled together in the following method:
 `[header,body]`
 
-Here is how RIP Responses are constructed in the reference python implementation:
+Here is how RRTP Responses are constructed in the reference python implementation:
 
 ```python
 packed_rip_respond = umsgpack.packb([header,body])
@@ -86,7 +88,7 @@ else:
 ```
 
 # 3.1 Response Headers
-RIP response headers look like this (exactly the same as Gemini Headers):
+RRTP response headers look like this (exactly the same as Gemini Headers):
 	
 
 `<STATUS><SPACE><META>`
@@ -111,7 +113,7 @@ If a server sends a `<STATUS>` which is not a two-digit number or a `<META>` whi
 
 # 3.2 Status codes
 
-RIP uses two-digit numeric status codes. Related status codes share the same first digit. Importantly, the first digit of RIP status codes do not group codes into vague categories like "client error" and "server error" as per HTTP. Instead, the first digit alone provides enough information for a client to determine how to handle the response. By design, it is possible to write a simple but feature complete client which only looks at the first digit. The second digit provides more fine-grained information, for unambiguous server logging, to allow writing comfier interactive clients which provide a slightly more streamlined user interface, and to allow writing more robust and intelligent automated clients like content aggregators, search engine crawlers, etc.
+RRTP uses two-digit numeric status codes. Related status codes share the same first digit. Importantly, the first digit of RRTP status codes do not group codes into vague categories like "client error" and "server error" as per HTTP. Instead, the first digit alone provides enough information for a client to determine how to handle the response. By design, it is possible to write a simple but feature complete client which only looks at the first digit. The second digit provides more fine-grained information, for unambiguous server logging, to allow writing comfier interactive clients which provide a slightly more streamlined user interface, and to allow writing more robust and intelligent automated clients like content aggregators, search engine crawlers, etc.
 
 The first digit of a response code unambiguously places the response into one of six categories, which define the semantics of the <META> line.
 
@@ -157,15 +159,15 @@ Note that for basic interactive clients for human use, errors 4 and 5 may be eff
 
 The full two-digit system is detailed in Appendix 1. Note that for each of the six valid first digits, a code with a second digit of zero corresponds is a generic status of that kind with no special semantics. This means that basic servers without any advanced functionality need only be able to return codes of 10, 20, 30, 40 or 50.
 
-The RIP status code system has been carefully designed so that the increased power (and correspondingly increased complexity) of the second digits is entirely "opt-in" on the part of both servers and clients.
+The RRTP status code system has been carefully designed so that the increased power (and correspondingly increased complexity) of the second digits is entirely "opt-in" on the part of both servers and clients.
 	
 # 3.3 Response bodies
 	
 Response bodies only accompany responses whose header indicates a SUCCESS status (i.e. a status code whose first digit is 2). For such responses, <META> is a MIME media type as defined in RFC 2046.
 	
-Internet media types are registered with a canonical form. Content transferred via RIP MUST be represented in the appropriate canonical form prior to its transmission except for "text" types, as defined in the next paragraph.
+Internet media types are registered with a canonical form. Content transferred via RRTP MUST be represented in the appropriate canonical form prior to its transmission except for "text" types, as defined in the next paragraph.
 	
-RIP allows the transport of text media with plain LF alone (but NOT a plain CR alone) representing a line break when it is done consistently for an entire response body. RIP clients MUST accept CRLF and bare LF as being representative of a line break in text media received via Gemini.
+RRTP allows the transport of text media with plain LF alone (but NOT a plain CR alone) representing a line break when it is done consistently for an entire response body. RRTP clients MUST accept CRLF and bare LF as being representative of a line break in text media received via Gemini.
 	
 If a MIME type begins with "text/" and no charset is explicitly given, the charset should be assumed to be UTF-8. Compliant clients MUST support UTF-8-encoded text/* responses. Clients MAY optionally support other encodings. Clients receiving a response in a charset they cannot decode SHOULD gracefully inform the user what happened instead of displaying garbage.
 	
@@ -182,14 +184,3 @@ TODO: I think using the Link.identify() method should do most of this, but still
 # 5 Micron Text Specification
 	
 Refer to the spec found in [Nomadnet](https://github.com/markqvist/nomadnet)
-	
-
-
-	
-	
-	
-
-	
-
-
-
