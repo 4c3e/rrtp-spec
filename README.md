@@ -57,7 +57,7 @@ RRTP requests are a single msgpacked Packet or Resource with the following struc
 The actual object being sent looks like this in the reference python implementation:
 
 ```python
-unpacked_request = [time.time(), request_path_hash, data]
+unpacked_request = [time.time(), request_path_hash, [header, body]]
 packed_request   = umsgpack.packb(unpacked_request)
 
 # Sent as packet it size is < RNS MTU
@@ -72,14 +72,14 @@ request_resource = RNS.Resource(packed_request, self, request_id = request_id, i
 
 # 3 RRTP Responses
 RRTP responses consist of a single CRLF-terminated header line, optionally followed by a response body. For simplicity, message headers and bodies are bundled together in the following method:
-`[header,body]`
+`[header, body]`
 
 Here is how RRTP Responses are constructed in the reference python implementation:
 
 ```python
-packed_rip_respond = umsgpack.packb([header,body])
+rrtp_packet = [header, body]
 
-packed_response = umsgpack.packb([request_id, packed_rip_response])
+packed_response = umsgpack.packb([request_id, rrtp_packet])
 
 if len(packed_response) <= Link.MDU:
 	RNS.Packet(self, packed_response, RNS.Packet.DATA, context = RNS.Packet.RESPONSE).send()
